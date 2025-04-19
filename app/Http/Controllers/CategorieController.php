@@ -12,8 +12,8 @@ class CategorieController extends Controller
      */
     public function index()
     {
-        $categories = Categorie::all();
-    return view('produits.create', compact('categories'));
+        $categories = Categorie::orderBy('nomCategorie')->get();
+        return view('categories.index', compact('categories'));
     }
 
     /**
@@ -34,7 +34,10 @@ class CategorieController extends Controller
             'description' => 'nullable|string',
         ]);
 
-        Categorie::create($request->all());
+        Categorie::create([
+            'nomCategorie' => $request->nomCategorie,
+            'description' => $request->description,
+        ]);
 
         return redirect()->route('categories.index')->with('success', 'Catégorie ajoutée avec succès.');
     }
@@ -65,9 +68,12 @@ class CategorieController extends Controller
             'description' => 'nullable|string',
         ]);
 
-        $categorie->update($request->all());
+        $categorie->update([
+            'nomCategorie' => $request->nomCategorie,
+            'description' => $request->description,
+        ]);
 
-        return redirect()->route('categories.index')->with('success', 'Catégorie mise à jour avec succès.');
+        return redirect()->route('categories.index')->with('success', 'Catégorie mise à jour.');
     }
 
     /**
@@ -76,6 +82,6 @@ class CategorieController extends Controller
     public function destroy(categorie $categorie)
     {
         $categorie->delete();
-        return redirect()->route('categories.index')->with('success', 'Catégorie supprimée avec succès.');
+        return redirect()->route('categories.index')->with('success', 'Catégorie supprimée.');
     }
 }

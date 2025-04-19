@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\produit;
+use App\Models\Produit;
+use App\Models\Categorie;
 use Illuminate\Http\Request;
 
 class ProduitController extends Controller
@@ -10,10 +11,20 @@ class ProduitController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $produits = Produit::with('categorie')->get();
-        return view('produits.index', compact('produits'));
+        $categorieId = $request->input('categorie_id');
+
+        $produits = Produit::with('categorie')
+            ->when($categorieId, function ($query, $categorieId) {
+                $query->where('categorie_id', $categorieId);
+            })
+            ->orderBy('nomProduit')
+            ->get();
+
+        $categories = Categorie::orderBy('nomCategorie')->get();
+
+        return view('produits.index', compact('produits', 'categories', 'categorieId'));
     }
 
     /**
@@ -21,7 +32,7 @@ class ProduitController extends Controller
      */
     public function create()
     {
-        $categories = \App\Models\Categorie::all();
+        $categories = Categorie::orderBy('nomCategorie')->get();
         return view('produits.create', compact('categories'));
     }
 
@@ -32,46 +43,69 @@ class ProduitController extends Controller
     {
         $request->validate([
             'nomProduit' => 'required|string|max:255',
-            'prix' => 'required|numeric|min:0',
+            'prix' => 'required|numeric',
             'quantite' => 'required|integer|min:0',
-            'idCategorie' => 'required|exists:categories,id',
-            'stock' => 'required|boolean',
+            'categorie_id' => 'required|exists:categories,id',
         ]);
-    
-        Produit::create($request->all());
-    
+
+        Produit::create([
+            'nomProduit' => $request->nomProduit,
+            'prix' => $request->prix,
+            'quantite' => $request->quantite,
+            'categorie_id' => $request->categorie_id,
+            'stock' => $request->quantite >= 1 ? 'Disponible' : 'Indisponible',
+        ]);
+
         return redirect()->route('produits.index')->with('success', 'Produit ajouté avec succès.');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(produit $produit)
+    public function show(Produit $produit)
     {
-        //
+        return view('produits.show', compact('produit'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(produit $produit)
+    public function edit(Produit $produit)
     {
-        //
+        $categories = Categorie::orderBy('nomCategorie')->get();
+        return view('produits.edit', compact('produit', 'categories'));
+
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, produit $produit)
+    public function update(Request $request, Produit $produit)
     {
-        //
+        $request->validate([
+            'nomProduit' => 'required|string|max:255',
+            'prix' => 'required|numeric',
+            'quantite' => 'required|integer|min:0',
+            'categorie_id' => 'required|exists:categories,id',
+        ]);
+
+        $produit->update([
+            'nomProduit' => $request->nomProduit,
+            'prix' => $request->prix,
+            'quantite' => $request->quantite,
+            'categorie_id' => $request->categorie_id,
+            'stock' => $request->quantite >= 1 ? 'Disponible' : 'Indisponible',
+        ]);
+
+        return redirect()->route('produits.index')->with('success', 'Produit mis à jour.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(produit $produit)
+    public function destroy(Produit $produit)
     {
-        //
+        $produit->delete();
+        return redirect()->route('produits.index')->with('success', 'Produit supprimé.');
     }
 }
