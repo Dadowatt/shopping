@@ -20,6 +20,6 @@
         </div>
     </div>
 
-    <a href="{{ route('produits.index') }}" class="btn btn-secondary mt-3">← Retour à la liste</a>
+    <a href="{{ route('produits.index') }}" class="btn btn-secondary mt-3">Retour à la liste</a>
 </div>
 @endsection
