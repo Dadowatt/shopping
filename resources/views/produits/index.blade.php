@@ -4,9 +4,19 @@
 <div class="container">
     <h1 class="mb-4">Liste des produits</h1>
 
+    @if(session('Success'))
+    <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
+
     <a href="{{ route('produits.create') }}" class="btn btn-success mb-3">
         <i class="bi bi-plus-circle"></i> Ajouter un produit
     </a>
+    
+    <form method="get" action="{{ route('produits.index') }}" class="mb-3 d-flex gap-2">
+    <input type="text" name="search" id="search-produit" class="form-control" placeholder="Rechercher un produit..." style="max-width: 300px;" value="{{ request('search') }}" />
+    <button type="submit" class="btn btn-primary">Filtrer</button>
+</form>
+
 
     {{-- Filtrage par catégorie --}}
     <form method="GET" action="{{ route('produits.index') }}" class="mb-4">
@@ -39,7 +49,7 @@
             @forelse($produits as $produit)
                 <tr>
                     <td>{{ $produit->nomProduit }}</td>
-                    <td>{{ $produit->prix }} €</td>
+                    <td>{{ $produit->prix }} FCFA</td>
                     <td>{{ $produit->quantite }}</td>
                     <td>{{ $produit->categorie->nomCategorie ?? 'Non défini' }}</td>
                     <td>

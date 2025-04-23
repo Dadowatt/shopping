@@ -14,6 +14,7 @@ class CategorieController extends Controller
     {
         $categories = Categorie::all();
         return view('categories.index', compact('categories'));
+        
     }
 
     /**

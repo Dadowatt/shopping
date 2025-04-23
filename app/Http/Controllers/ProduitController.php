@@ -13,6 +13,26 @@ class ProduitController extends Controller
      */
     public function index(Request $request)
     {
+        $query = Produit::query();
+
+    // Filtrage par catégorie
+    $categorieId = $request->get('categorie_id');
+    if ($categorieId) {
+        $query->where('categorie_id', $categorieId);
+    }
+
+    // Filtrage par nom
+    $search = $request->get('search');
+    if ($search) {
+        $query->where('nomProduit', 'LIKE', '%' . $search . '%');
+    }
+
+    $produits = $query->with('categorie')->get(); // ou ->paginate() si tu veux la pagination
+    $categories = Categorie::all();
+
+    return view('produits.index', compact('produits', 'categories', 'categorieId'));
+
+    
         $categorieId = $request->input('categorie_id');
 
         $produits = Produit::with('categorie')
@@ -25,6 +45,7 @@ class ProduitController extends Controller
         $categories = Categorie::orderBy('nomCategorie')->get();
 
         return view('produits.index', compact('produits', 'categories', 'categorieId'));
+        
     }
 
     /**
@@ -74,7 +95,6 @@ class ProduitController extends Controller
     {
         $categories = Categorie::orderBy('nomCategorie')->get();
         return view('produits.edit', compact('produit', 'categories'));
-
     }
 
     /**
@@ -108,4 +128,5 @@ class ProduitController extends Controller
         $produit->delete();
         return redirect()->route('produits.index')->with('success', 'Produit supprimé.');
     }
+    
 }
