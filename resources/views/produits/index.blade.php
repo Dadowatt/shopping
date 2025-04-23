@@ -4,24 +4,17 @@
 <div class="container">
     <h1 class="mb-4">Liste des produits</h1>
 
-    @if(session('Success'))
+    @if(session('success'))
     <div class="alert alert-success">{{ session('success') }}</div>
     @endif
 
     <a href="{{ route('produits.create') }}" class="btn btn-success mb-3">
         <i class="bi bi-plus-circle"></i> Ajouter un produit
     </a>
-    
-    <form method="get" action="{{ route('produits.index') }}" class="mb-3 d-flex gap-2">
-    <input type="text" name="search" id="search-produit" class="form-control" placeholder="Rechercher un produit..." style="max-width: 300px;" value="{{ request('search') }}" />
-    <button type="submit" class="btn btn-primary">Filtrer</button>
-</form>
 
-
-    {{-- Filtrage par catégorie --}}
+    <div class="d-flex justify-content-between">
+         {{-- Filtrage par catégorie --}}
     <form method="GET" action="{{ route('produits.index') }}" class="mb-4">
-        <div class="row">
-            <div class="col-md-4">
                 <select name="categorie_id" class="form-select" onchange="this.form.submit()">
                     <option value="">-- Toutes les catégories --</option>
                     @foreach($categories as $categorie)
@@ -29,10 +22,14 @@
                             {{ $categorie->nomCategorie }}
                         </option>
                     @endforeach
-                </select>
-            </div>
-        </div>
+                </select> 
     </form>
+
+    <form method="get" action="{{ route('produits.index') }}" class="mb-3 d-flex gap-2">
+    <input type="text" name="search" id="search-produit" class="form-control" placeholder="Rechercher un produit..." style="max-width: 300px;" value="{{ request('search') }}" />
+    <button type="submit" class="btn btn-primary">Filtrer</button>
+    </form>
+    </div>
 
     <table class="table table-bordered table-striped">
         <thead class="table-dark">

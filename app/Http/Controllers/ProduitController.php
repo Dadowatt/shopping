@@ -27,24 +27,10 @@ class ProduitController extends Controller
         $query->where('nomProduit', 'LIKE', '%' . $search . '%');
     }
 
-    $produits = $query->with('categorie')->get(); // ou ->paginate() si tu veux la pagination
-    $categories = Categorie::all();
+    $produits = $query->with('categorie')->orderBy('nomProduit')->get();
+    $categories = Categorie::orderBy('nomCategorie')->get();
 
     return view('produits.index', compact('produits', 'categories', 'categorieId'));
-
-    
-        $categorieId = $request->input('categorie_id');
-
-        $produits = Produit::with('categorie')
-            ->when($categorieId, function ($query, $categorieId) {
-                $query->where('categorie_id', $categorieId);
-            })
-            ->orderBy('nomProduit')
-            ->get();
-
-        $categories = Categorie::orderBy('nomCategorie')->get();
-
-        return view('produits.index', compact('produits', 'categories', 'categorieId'));
         
     }
 
